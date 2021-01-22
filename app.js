@@ -40,14 +40,22 @@ app.post('/upload', (req, res) => {
           data: {
             text
           }
-        } = await worker.recognize('https://www.bibleverseimages.com/love-bible-verse-2l.jpg');
+        } = await worker.recognize(data);
         console.log(text);
+        await worker.getPDF(text);
+        fs.writeFileSync('tesseract-ocr-result.pdf', Buffer.from(text));
+
+        console.log('Generate PDF: tesseract-ocr-result.pdf');
+        const results = `${__dirname}/tesseract-ocr-result.pdf`
+        res.download(
+          results
+        )
+
         await worker.terminate();
       })();
 
     })
   })
-  res.redirect('back')
 })
 
 app.listen(5000 || process.env.PORT, () => console.log('Running on port 5000'))
